@@ -1,0 +1,16 @@
+# Environment variables (SENSITIVE - DO NOT COMMIT)
+.env
+
+# Virtual environment
+venv/
+env/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# State / generated files
+posted_urls.json
+news_image_*.png
+.DS_Store

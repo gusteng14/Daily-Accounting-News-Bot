@@ -1,6 +1,27 @@
 import os
 import textwrap
+import urllib.request
 from PIL import Image, ImageDraw, ImageFont
+
+def get_font(size, bold=False):
+    font_url = "https://github.com/googlefonts/roboto/raw/main/src/hinted/Roboto-Bold.ttf" if bold else "https://github.com/googlefonts/roboto/raw/main/src/hinted/Roboto-Regular.ttf"
+    font_name = "Roboto-Bold.ttf" if bold else "Roboto-Regular.ttf"
+    
+    # Store font in the same directory as this script
+    font_path = os.path.join(os.path.dirname(__file__), font_name)
+    
+    if not os.path.exists(font_path):
+        try:
+            print(f"Downloading font {font_name}...")
+            urllib.request.urlretrieve(font_url, font_path)
+        except Exception as e:
+            print(f"Failed to download font: {e}")
+            return ImageFont.load_default()
+            
+    try:
+        return ImageFont.truetype(font_path, size)
+    except Exception:
+        return ImageFont.load_default()
 
 def create_headline_image(headline, source, output_filename="headline_image.png"):
     """
@@ -20,18 +41,9 @@ def create_headline_image(headline, source, output_filename="headline_image.png"
     # Top border line
     draw.rectangle([(50, 50), (width - 50, 60)], fill=accent_color)
     
-    # 3. Load fonts (using default PIL font since we can't guarantee system fonts)
-    # In a production environment, you would download a TTF file like Roboto or Inter
-    try:
-        # Try to use a common Windows font if available
-        title_font = ImageFont.truetype("arialbd.ttf", 60)
-        source_font = ImageFont.truetype("arial.ttf", 40)
-        brand_font = ImageFont.truetype("arialbd.ttf", 35)
-    except IOError:
-        # Fallback to default, though it will be small
-        title_font = ImageFont.load_default()
-        source_font = ImageFont.load_default()
-        brand_font = ImageFont.load_default()
+    title_font = get_font(60, bold=True)
+    source_font = get_font(40, bold=False)
+    brand_font = get_font(35, bold=True)
         
     # 4. Draw the source tag above the headline
     source_text = f"SOURCE: {source.upper()}"

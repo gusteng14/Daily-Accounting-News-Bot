@@ -21,7 +21,7 @@ def fetch_google_news_rss():
     
     # Get today's date to filter out old news
     today = datetime.datetime.now().date()
-    start_date = today - datetime.timedelta(days=90)
+    start_date = today - datetime.timedelta(days=7)
     
     for entry in feed.entries:
         # Check if the news is from the last 1-3 months

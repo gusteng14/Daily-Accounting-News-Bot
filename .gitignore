@@ -11,6 +11,5 @@ __pycache__/
 *$py.class
 
 # State / generated files
-posted_urls.json
 news_image_*.png
 .DS_Store

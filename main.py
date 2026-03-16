@@ -54,16 +54,16 @@ def main():
         if summary_text.endswith(item['source']):
             summary_text = summary_text[:-len(item['source'])].strip()
             
+        # If the summary is too short or is identical to the title, use the title to avoid duplication
         if not summary_text or len(summary_text) < 10 or title.lower() in summary_text.lower() or summary_text.lower() in title.lower():
-            summary_text = "Click the link below to read the full update and stay informed on the latest policies!"
+            summary_text = title
             
         message = (
             f"🚨 𝗕𝗥𝗘𝗔𝗞𝗜𝗡𝗚 𝗨𝗣𝗗𝗔𝗧𝗘 𝗙𝗥𝗢𝗠 {item['source'].upper()} 🚨\n\n"
-            f"📌 {title}\n\n"
             f"💡 𝗪𝗵𝗮𝘁 𝘆𝗼𝘂 𝗻𝗲𝗲𝗱 𝘁𝗼 𝗸𝗻𝗼𝘄:\n"
             f"{summary_text}\n\n"
-            f"🔗 Read the full details here: {item['link']}\n\n"
-            f"#AccountingPH #TaxPH #BusinessNews #{item['source'].replace(' ', '')}"
+            f"Click the link below to read the full update and stay informed on the latest policies!\n"
+            f"{item['link']}"
         )
         
         print(f"Drafted Message:\n{message}\n")

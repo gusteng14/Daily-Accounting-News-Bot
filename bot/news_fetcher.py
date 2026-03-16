@@ -12,7 +12,7 @@ HEADERS = {
 def fetch_google_news_rss():
     """Fetches news from Google News RSS using specific queries for Philippine accounting/gov/firms."""
     # Query targets specified agencies in the Philippines
-    query = '("Bureau of Internal Revenue" OR BIR OR "Securities and Exchange Commission" OR "SEC Philippines" OR "Social Security System" OR SSS OR "Pag-IBIG" OR HDMF OR "Bangko Sentral ng Pilipinas" OR BSP) -basketball -NCAA -sports location:Philippines'
+    query = '("Bureau of Internal Revenue" OR BIR OR "Securities and Exchange Commission" OR "SEC Philippines" OR "Social Security System" OR SSS OR "Pag-IBIG" OR HDMF OR "Bangko Sentral ng Pilipinas" OR BSP) -basketball -NCAA -sports -PRC -"Professional Regulation Commission" location:Philippines'
     encoded_query = quote(query)
     rss_url = f'https://news.google.com/rss/search?q={encoded_query}&hl=en-PH&gl=PH&ceid=PH:en'
     
@@ -33,10 +33,21 @@ def fetch_google_news_rss():
                 raw_summary = entry.summary if hasattr(entry, 'summary') else ""
                 clean_summary = BeautifulSoup(raw_summary, "html.parser").get_text() if raw_summary else ""
                 
+                # Extract first complete sentence to avoid '...'
+                clean_text = clean_summary.replace('...', '')
+                sentences = re.split(r'(?<=[.!?])\s+', clean_text)
+                final_summary = "Read the full update from the official source."
+                for s in sentences:
+                    if len(s) > 30:
+                        final_summary = s.strip()
+                        if not final_summary.endswith(('.', '!', '?')):
+                            final_summary += '.'
+                        break
+                
                 news_items.append({
                     'title': entry.title,
                     'link': entry.link,
-                    'summary': clean_summary,
+                    'summary': final_summary,
                     'source': entry.source.title if hasattr(entry, 'source') else 'Google News',
                     'date': entry.published
                 })
@@ -45,10 +56,20 @@ def fetch_google_news_rss():
             raw_summary = entry.summary if hasattr(entry, 'summary') else ""
             clean_summary = BeautifulSoup(raw_summary, "html.parser").get_text() if raw_summary else ""
             
+            clean_text = clean_summary.replace('...', '')
+            sentences = re.split(r'(?<=[.!?])\s+', clean_text)
+            final_summary = "Read the full update from the official source."
+            for s in sentences:
+                if len(s) > 30:
+                    final_summary = s.strip()
+                    if not final_summary.endswith(('.', '!', '?')):
+                        final_summary += '.'
+                    break
+            
             news_items.append({
                 'title': entry.title,
                 'link': entry.link,
-                'summary': clean_summary,
+                'summary': final_summary,
                 'source': entry.source.title if hasattr(entry, 'source') else 'Google News',
                 'date': entry.published if hasattr(entry, 'published') else str(today)
             })
@@ -89,8 +110,15 @@ def scrape_homepage_news(url, agency_name):
                         # Get first substantive paragraph
                         article_summary = default_summary
                         for p in p_tags:
-                            if len(p.get_text(strip=True)) > 50:
-                                article_summary = p.get_text(strip=True)[:150] + "..."
+                            text = p.get_text(strip=True)
+                            if len(text) > 50:
+                                sentences = re.split(r'(?<=[.!?])\s+', text.replace('...', ''))
+                                if sentences and len(sentences[0]) > 20:
+                                    article_summary = sentences[0].strip()
+                                    if not article_summary.endswith(('.', '!', '?')):
+                                        article_summary += '.'
+                                else:
+                                    article_summary = text.strip() + '.'
                                 break
                     except:
                         article_summary = default_summary

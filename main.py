@@ -44,18 +44,15 @@ def main():
         create_headline_image(item['title'], item['source'], image_filename)
         
         # B. Format Engaging Text
-        # The prompt requested an engaging, short content
+        # The prompt requested strictly headline, description, and source
         summary_text = item.get('summary', '').strip()
         if not summary_text or len(summary_text) < 10:
-            summary_text = "Click the link below to read the full update and stay informed on the latest policies!"
+            summary_text = "Click the link below to read the full update and stay informed."
             
         message = (
-            f"🚨 𝗕𝗥𝗘𝗔𝗞𝗜𝗡𝗚 𝗨𝗣𝗗𝗔𝗧𝗘 𝗙𝗥𝗢𝗠 {item['source'].upper()} 🚨\n\n"
-            f"📌 {item['title']}\n\n"
-            f"💡 𝗪𝗵𝗮𝘁 𝘆𝗼𝘂 𝗻𝗲𝗲𝗱 𝘁𝗼 𝗸𝗻𝗼𝘄:\n"
-            f"{summary_text}\n\n"
-            f"🔗 Read the full details here: {item['link']}\n\n"
-            f"#AccountingPH #TaxPH #BusinessNews #{item['source'].replace(' ', '')}"
+            f"Headline: {item['title']}\n"
+            f"Source: {item['source']}\n\n"
+            f"Description: {summary_text}"
         )
         
         print(f"Drafted Message:\n{message}\n")

@@ -7,7 +7,7 @@ from bot.facebook_poster import post_to_facebook
 from bot.image_generator import create_headline_image
 
 def main():
-    print(f"--- Running Daily Accounting News Bot ({datetime.datetime.now()}) ---")
+    print(f"--- Running Daily Pet Care Tips Bot ({datetime.datetime.now()}) ---")
     
     # Load previously posted URLs to avoid duplicates
     posted_urls_file = "posted_urls.json"
@@ -27,7 +27,7 @@ def main():
     news_items = [item for item in all_news_items if item['link'] not in posted_urls]
     
     if not news_items:
-        print("No new/unposted accounting/business news found.")
+        print("No new/unposted pet care tips found.")
         return
         
     print(f"Found {len(news_items)} new unposted items.")
@@ -62,8 +62,9 @@ def main():
             f"🚨 𝗕𝗥𝗘𝗔𝗞𝗜𝗡𝗚 𝗨𝗣𝗗𝗔𝗧𝗘 𝗙𝗥𝗢𝗠 {item['source'].upper()} 🚨\n\n"
             f"💡 𝗪𝗵𝗮𝘁 𝘆𝗼𝘂 𝗻𝗲𝗲𝗱 𝘁𝗼 𝗸𝗻𝗼𝘄:\n"
             f"{summary_text}\n\n"
-            f"Click the link below to read the full update and stay informed on the latest policies!\n"
-            f"{item['link']}"
+            f"Click the link below for more helpful tips to keep your furry friend happy and healthy!\n"
+            f"{item['link']}\n\n"
+            f"#PetCare #PetTips #AnimalWelfare #{item['source'].replace(' ', '')}"
         )
         
         print(f"Drafted Message:\n{message}\n")

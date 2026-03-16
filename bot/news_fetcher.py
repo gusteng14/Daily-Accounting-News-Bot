@@ -11,8 +11,8 @@ HEADERS = {
 
 def fetch_google_news_rss():
     """Fetches news from Google News RSS using specific queries for Philippine accounting/gov/firms."""
-    # Query targets specified agencies in the Philippines
-    query = '("Bureau of Internal Revenue" OR BIR OR "Securities and Exchange Commission" OR "SEC Philippines" OR "Social Security System" OR SSS OR "Pag-IBIG" OR HDMF OR "Bangko Sentral ng Pilipinas" OR BSP) -basketball -NCAA -sports -PRC -"Professional Regulation Commission" location:Philippines'
+    # Query targets reliable pet care sources
+    query = '("pet care" OR "dog care" OR "cat care" OR "pet health") (site:avma.org OR site:aspca.org OR site:petmd.com OR site:akc.org)'
     encoded_query = quote(query)
     rss_url = f'https://news.google.com/rss/search?q={encoded_query}&hl=en-PH&gl=PH&ceid=PH:en'
     
@@ -76,85 +76,10 @@ def fetch_google_news_rss():
             
     return news_items
 
-def scrape_homepage_news(url, agency_name):
-    """
-    A generic scraper that tries to find recent news or press releases on a given homepage.
-    It looks for common keywords in links like 'news', 'press-release', 'advisory', 'article'.
-    """
-    news_items = []
-    try:
-        response = requests.get(url, headers=HEADERS, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Attempt to get meta description of the homepage for a generic summary
-        meta_desc = soup.find('meta', attrs={'name': 'description'})
-        default_summary = meta_desc['content'] if meta_desc else "Latest updates from official sources."
-        
-        # Look for links that might represent news
-        keywords = ['news', 'press-release', 'advisory', 'article', 'updates']
-        for a_tag in soup.find_all('a', href=True):
-            href = a_tag['href']
-            text = a_tag.get_text(strip=True)
-            
-            # Simple heuristic: if the link text is long enough to be a title and URL has a keyword
-            if len(text) > 25 and any(kw in href.lower() for kw in keywords):
-                full_link = urljoin(url, href)
-                # Avoid duplicates
-                if not any(item['link'] == full_link for item in news_items):
-                    # Try to fetch the actual article to get a better summary (optional, but requested for engaging content)
-                    try:
-                        art_resp = requests.get(full_link, headers=HEADERS, timeout=5)
-                        art_soup = BeautifulSoup(art_resp.content, 'html.parser')
-                        p_tags = art_soup.find_all('p')
-                        # Get first substantive paragraph
-                        article_summary = default_summary
-                        for p in p_tags:
-                            text = p.get_text(strip=True)
-                            if len(text) > 50:
-                                sentences = re.split(r'(?<=[.!?])\s+', text.replace('...', ''))
-                                if sentences and len(sentences[0]) > 20:
-                                    article_summary = sentences[0].strip()
-                                    if not article_summary.endswith(('.', '!', '?')):
-                                        article_summary += '.'
-                                else:
-                                    article_summary = text.strip() + '.'
-                                break
-                    except:
-                        article_summary = default_summary
-
-                    news_items.append({
-                        'title': text,
-                        'link': full_link,
-                        'summary': article_summary,
-                        'source': agency_name,
-                        'date': str(datetime.datetime.now().date()) # Rough approximation for today
-                    })
-                    
-    except Exception as e:
-        print(f"Error scraping {url}: {e}")
-        
-    return news_items
-
 def fetch_all_daily_news():
     """Aggregates news from all sources."""
-    print("Fetching news from Google News RSS...")
+    print("Fetching pet care tips from Google News RSS...")
     all_news = fetch_google_news_rss()
-    
-    # We can also attempt to scrape some official homepages directly as requested
-    targets = [
-        ('https://www.bir.gov.ph/', 'BIR'),
-        ('https://www.sec.gov.ph/', 'SEC'),
-        ('https://www.sss.gov.ph/', 'SSS'),
-        ('https://www.pagibigfund.gov.ph/', 'Pag-IBIG'),
-        ('https://www.bsp.gov.ph/', 'BSP')
-    ]
-    
-    for url, name in targets:
-        print(f"Attempting to scrape {name} homepage directly...")
-        direct_news = scrape_homepage_news(url, name)
-        # Limit to top 2 to not overwhelm
-        all_news.extend(direct_news[:2])
         
     # Remove duplicates based on link and title similarity
     unique_news = []

@@ -30,9 +30,9 @@ def create_headline_image(headline, source, output_filename="headline_image.png"
     # 1. Create a background canvas (1080x1080 for Facebook/Instagram square)
     width = 1080
     height = 1080
-    bg_color = (20, 30, 48) # Dark blue/slate background
-    text_color = (255, 255, 255) # White text
-    accent_color = (0, 204, 153) # Teal green accent for accounting feel
+    bg_color = (255, 248, 220) # Light Pastel Yellow/Cornsilk
+    text_color = (40, 40, 40) # Dark gray text for readability
+    accent_color = (255, 153, 153) # Pastel pink accent
     
     img = Image.new('RGB', (width, height), color=bg_color)
     draw = ImageDraw.Draw(img)
@@ -60,8 +60,8 @@ def create_headline_image(headline, source, output_filename="headline_image.png"
         y_text += 80 # line height
         
     # 6. Draw branding at the bottom
-    brand_text = "Philippine Accounting & Business News"
-    draw.text((100, height - 150), brand_text, font=brand_font, fill=(150, 150, 150))
+    brand_text = "Daily Pet Care Tips"
+    draw.text((100, height - 150), brand_text, font=brand_font, fill=(100, 100, 100))
     
     # Bottom border line
     draw.rectangle([(50, height - 60), (width - 50, height - 50)], fill=accent_color)
